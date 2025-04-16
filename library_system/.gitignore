@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+venv/
+
+# Django
+db.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# dotenv
+.env
+
+# VS Code
+.vscode/
+
+# MySQL dump files (if any)
+*.sql
+
+# macOS/Linux
+.DS_Store

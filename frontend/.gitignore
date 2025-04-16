@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+.cache/
+.npm/
+.vite/
+
+# Build output
+build/
+coverage/
+*.log
+
+# Vite
+.vite/
+
+# dotenv
+.env
+.env.*.local
+
+# Editor settings
+.vscode/
+.idea/
+
+# macOS/Linux
+.DS_Store

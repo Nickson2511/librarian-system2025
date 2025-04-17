@@ -34,7 +34,6 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=400)
 
 
-
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)

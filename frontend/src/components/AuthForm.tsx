@@ -22,9 +22,10 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setFieldErrors({});
+
     const errors: Record<string, string[]> = {};
 
-    // Validate email (always)
     if (!email) {
       errors.email = ['Email is required.'];
     } else {
@@ -34,31 +35,17 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
       }
     }
 
-    // Validate password based on login/signup
     if (!password) {
       errors.password = ['Password is required.'];
     } else if (!isLogin) {
       if (password.length < 8) {
         errors.password = ['Password must be at least 8 characters.'];
-      } else if (!/[a-z]/.test(password)) {
-        errors.password = ['Password must contain at least one lowercase letter.'];
-      } else if (!/[A-Z]/.test(password)) {
-        errors.password = ['Password must contain at least one uppercase letter.'];
-      } else if (!/[0-9]/.test(password)) {
-        errors.password = ['Password must contain at least one number.'];
-      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-        errors.password = ['Password must contain at least one special character.'];
       }
     }
 
-    // Signup-only fields
     if (!isLogin) {
-      if (!firstName) {
-        errors.first_name = ['First name is required.'];
-      }
-      if (!lastName) {
-        errors.last_name = ['Last name is required.'];
-      }
+      if (!firstName) errors.first_name = ['First name is required.'];
+      if (!lastName) errors.last_name = ['Last name is required.'];
     }
 
     if (Object.keys(errors).length > 0) {
@@ -74,8 +61,8 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
 
     if (submitErrors) {
       setFieldErrors(submitErrors);
-      if (submitErrors.general) {
-        setErrorMessage(submitErrors.general[0]);
+      if (submitErrors.non_field_errors || submitErrors.message) {
+        setErrorMessage(submitErrors.non_field_errors?.[0] || submitErrors.message?.[0]);
       }
     }
   };
@@ -94,18 +81,17 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
             placeholder="First Name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="w-full mb-2 p-3 bg-gray-900 text-white border border-gray-700 rounded-lg"
+            className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
           />
           {fieldErrors.first_name && (
             <p className="text-red-400 text-sm mb-2">{fieldErrors.first_name.join(', ')}</p>
           )}
-
           <input
             type="text"
             placeholder="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="w-full mb-2 p-3 bg-gray-900 text-white border border-gray-700 rounded-lg"
+            className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
           />
           {fieldErrors.last_name && (
             <p className="text-red-400 text-sm mb-2">{fieldErrors.last_name.join(', ')}</p>
@@ -118,7 +104,7 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full mb-2 p-3 bg-gray-900 text-white border border-gray-700 rounded-lg"
+        className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
       />
       {fieldErrors.email && (
         <p className="text-red-400 text-sm mb-2">{fieldErrors.email.join(', ')}</p>
@@ -129,7 +115,7 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="w-full mb-2 p-3 bg-gray-900 text-white border border-gray-700 rounded-lg"
+        className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
       />
       {fieldErrors.password && (
         <p className="text-red-400 text-sm mb-2">{fieldErrors.password.join(', ')}</p>
@@ -141,27 +127,22 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
 
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
       >
         {isLogin ? 'Login' : 'Signup'}
       </button>
 
-      <div className="mt-4 text-sm text-center">
+      <p className="text-sm mt-4">
         {isLogin ? (
           <>
-            <Link to="/signup" className="text-blue-400 hover:underline block">
-              Don't have an account? Signup
-            </Link>
-            <Link to="/forgot-password" className="text-blue-400 hover:underline block mt-2">
-              Forgot password?
-            </Link>
+            Don’t have an account? <Link to="/signup" className="text-blue-400">Signup</Link>
           </>
         ) : (
-          <Link to="/login" className="text-blue-400 hover:underline">
-            Already have an account? Login
-          </Link>
+          <>
+            Already have an account? <Link to="/login" className="text-blue-400">Login</Link>
+          </>
         )}
-      </div>
+      </p>
     </form>
   );
 };

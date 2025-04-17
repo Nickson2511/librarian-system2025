@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import LibrarySvg from '../assets/library.svg';
 import { useState } from 'react';
-import { AxiosError } from 'axios';
 
 const SignupPage = () => {
   const dispatch = useAppDispatch();
@@ -18,23 +17,21 @@ const SignupPage = () => {
     last_name?: string;
   }): Promise<Record<string, string[]> | null> => {
     try {
-      const { email, password, first_name, last_name } = formData;
-
       const result = await dispatch(
         registerAdmin({
-          email,
-          password,
-          first_name: first_name!,
-          last_name: last_name!,
+          email: formData.email,
+          password: formData.password,
+          first_name: formData.first_name!,
+          last_name: formData.last_name!,
         })
       ).unwrap();
 
       console.log('Signup successful! Token:', result);
       navigate('/login');
       return null;
-    } catch (err: unknown) {
-      if ((err as AxiosError)?.response?.data) {
-        return (err as AxiosError).response?.data as Record<string, string[]>;
+    } catch (err) {
+      if (typeof err === 'object' && err !== null) {
+        return err as Record<string, string[]>;
       }
       setErrorMessage('Something went wrong. Try again.');
       return null;
@@ -61,6 +58,8 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
+
+
 
 
 

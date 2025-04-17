@@ -4,6 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import LibrarySvg from '../assets/library.svg';
 
+type ErrorWithResponse = {
+  response: {
+    data: Record<string, string[]>;
+  };
+};
+
+const isErrorWithResponse = (err: unknown): err is ErrorWithResponse => {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'response' in err &&
+    typeof (err as { response?: unknown }).response === 'object' &&
+    err.response !== null &&
+    'data' in (err as { response: { data?: unknown } }).response
+  );
+};
+
 const LoginPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -13,13 +30,17 @@ const LoginPage = () => {
     password: string;
     first_name?: string;
     last_name?: string;
-  }) => {
+  }): Promise<Record<string, string[]> | null> => {
     try {
       const result = await dispatch(loginAdmin(formData)).unwrap();
       console.log('Login successful! Token:', result);
       navigate('/');
-    } catch (err) {
-      console.error('Login failed:', err);
+      return null;
+    } catch (err: unknown) {
+      if (isErrorWithResponse(err)) {
+        return err.response.data;
+      }
+      return { general: ['Invalid email or password'] };
     }
   };
 
@@ -36,11 +57,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
-
-
-
-
 
 
 

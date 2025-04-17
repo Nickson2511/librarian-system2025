@@ -1,48 +1,96 @@
+# accounts/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import authenticate
+from rest_framework import status, permissions
 from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
 from .models import AdminUser
-from rest_framework.authentication import TokenAuthentication
 from .serializers import RegisterSerializer, LoginSerializer
-
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, DestroyAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 class RegisterView(APIView):
-    authentication_classes = [TokenAuthentication]
-
     def post(self, request):
-        # Check if any admin exists in the DB
-        total_admins = AdminUser.objects.count()
-
-        # If admins already exist, require authentication
-        if total_admins > 0:
-            if not request.user or not request.user.is_authenticated:
-                return Response(
-                    {"error": "Only authenticated admins can create new admins."},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({
-                "message": "Admin registered successfully.",
-                "token": token.key
-            }, status=201)
-        return Response(serializer.errors, status=400)
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"message": "Admin registered successfully", "token": token.key}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data['password']
-            user = authenticate(email=email, password=password)
+            user = authenticate(email=serializer.validated_data['email'], password=serializer.validated_data['password'])
             if user:
                 token, created = Token.objects.get_or_create(user=user)
-                return Response({"message": "Login successful!", "token": token.key})
-            return Response({"error": "Invalid credentials"}, status=401)
-        return Response(serializer.errors, status=400)
+                return Response({"message": "Login successful", "token": token.key}, status=status.HTTP_200_OK)
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminDetailView(RetrieveAPIView):
+    queryset = AdminUser.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        admin = get_object_or_404(AdminUser, pk=pk)
+        return Response({
+            "id": admin.id,
+            "first_name": admin.first_name,
+            "last_name": admin.last_name,
+            "email": admin.email,
+            "role": admin.role
+        })
+
+
+class AdminListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        admins = AdminUser.objects.all()
+        data = [{
+            "id": admin.id,
+            "first_name": admin.first_name,
+            "last_name": admin.last_name,
+            "email": admin.email,
+            "role": admin.role
+        } for admin in admins]
+        return Response(data)
+
+
+class AdminUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        admin = get_object_or_404(AdminUser, pk=pk)
+        
+        for field in ['first_name', 'last_name', 'email', 'role']:
+            if field in request.data:
+                setattr(admin, field, request.data[field])
+
+        admin.save()
+        return Response({"message": "Admin updated successfully"})
+
+
+class AdminDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        admin = get_object_or_404(AdminUser, pk=pk)
+        
+        admin.delete()
+        return Response({"message": "Admin deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
+
+
+
+
+

@@ -18,6 +18,7 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
   const [lastName, setLastName] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,8 +62,16 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
 
     if (submitErrors) {
       setFieldErrors(submitErrors);
-      if (submitErrors.non_field_errors || submitErrors.message) {
-        setErrorMessage(submitErrors.non_field_errors?.[0] || submitErrors.message?.[0]);
+      if (
+        submitErrors.non_field_errors ||
+        submitErrors.message ||
+        submitErrors.general
+      ) {
+        setErrorMessage(
+          submitErrors.non_field_errors?.[0] ||
+          submitErrors.message?.[0] ||
+          submitErrors.general?.[0]
+        );
       }
     }
   };
@@ -72,7 +81,9 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
       onSubmit={handleSubmit}
       className="w-full max-w-md flex flex-col items-center bg-gray-800 text-white p-8 rounded-lg shadow-md"
     >
-      <h2 className="text-2xl font-bold mb-6">{isLogin ? 'Login' : 'Signup'}</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        {isLogin ? 'Login' : 'Signup'}
+      </h2>
 
       {!isLogin && (
         <>
@@ -84,8 +95,11 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
             className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
           />
           {fieldErrors.first_name && (
-            <p className="text-red-400 text-sm mb-2">{fieldErrors.first_name.join(', ')}</p>
+            <p className="text-red-400 text-sm mb-2">
+              {fieldErrors.first_name.join(', ')}
+            </p>
           )}
+
           <input
             type="text"
             placeholder="Last Name"
@@ -94,7 +108,9 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
             className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
           />
           {fieldErrors.last_name && (
-            <p className="text-red-400 text-sm mb-2">{fieldErrors.last_name.join(', ')}</p>
+            <p className="text-red-400 text-sm mb-2">
+              {fieldErrors.last_name.join(', ')}
+            </p>
           )}
         </>
       )}
@@ -107,22 +123,45 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
         className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
       />
       {fieldErrors.email && (
-        <p className="text-red-400 text-sm mb-2">{fieldErrors.email.join(', ')}</p>
+        <p className="text-red-400 text-sm mb-2">
+          {fieldErrors.email.join(', ')}
+        </p>
       )}
 
       <input
-        type="password"
+        type={showPassword ? 'text' : 'password'}
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="w-full mb-2 p-3 bg-gray-900 border border-gray-700 rounded-lg"
       />
       {fieldErrors.password && (
-        <p className="text-red-400 text-sm mb-2">{fieldErrors.password.join(', ')}</p>
+        <p className="text-red-400 text-sm mb-2">
+          {fieldErrors.password.join(', ')}
+        </p>
       )}
 
+      <div className="w-full flex items-center justify-between text-sm mb-4">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={showPassword}
+            onChange={() => setShowPassword(!showPassword)}
+            className="accent-blue-600"
+          />
+          Show password
+        </label>
+        {isLogin && (
+          <Link to="/forgot-password" className="text-blue-400 hover:underline">
+            Forgot password?
+          </Link>
+        )}
+      </div>
+
       {errorMessage && (
-        <div className="text-red-400 mb-4 text-sm w-full text-left">{errorMessage}</div>
+        <div className="text-red-400 mb-4 text-sm w-full text-left">
+          {errorMessage}
+        </div>
       )}
 
       <button
@@ -135,11 +174,17 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
       <p className="text-sm mt-4">
         {isLogin ? (
           <>
-            Don’t have an account? <Link to="/signup" className="text-blue-400">Signup</Link>
+            Don’t have an account?{' '}
+            <Link to="/signup" className="text-blue-400">
+              Signup
+            </Link>
           </>
         ) : (
           <>
-            Already have an account? <Link to="/login" className="text-blue-400">Login</Link>
+            Already have an account?{' '}
+            <Link to="/login" className="text-blue-400">
+              Login
+            </Link>
           </>
         )}
       </p>
@@ -148,6 +193,7 @@ const AuthForm = ({ isLogin, onSubmit }: AuthFormProps) => {
 };
 
 export default AuthForm;
+
 
 
 

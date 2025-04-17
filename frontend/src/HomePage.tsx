@@ -18,7 +18,11 @@ const HomePage = () => {
         <h1 className="text-3xl md:text-5xl font-bold leading-snug">
           Welcome to  Librarian Management System
         </h1>
-        <p>manage all library services including managing users, managing books, managing articles etc, </p>
+        <p className="text-lg text-gray-300 max-w-xl leading-relaxed">
+  Manage all library services including managing users, books, articles,
+  students, admins, and more — all in one place.
+</p>
+
 
         <Link to="/login">
           <button className="bg-blue-600 hover:bg-blue-700 transition duration-300 text-white py-2 px-6 rounded-lg w-full max-w-xs">

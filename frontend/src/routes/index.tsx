@@ -6,6 +6,7 @@ import ForgotPasswordPage from '../components/ForgotPasswordPage';
 import DashboardPage from '../pages/DashboardPage';
 import StudentManager from '../components/StudentManager';
 import BookManager from '../components/BookManager';
+import IssueBook from '../components/IssueBook';
 import LibrarianLayout from '../layouts/LibrarianLayout';
 const AppRoutes = () => {
   return (
@@ -28,7 +29,13 @@ const AppRoutes = () => {
           <BookManager />
           </LibrarianLayout>
           }
-         />
+      />
+      <Route path='/issue-book' element={
+        <LibrarianLayout>
+          <IssueBook />
+        </LibrarianLayout>
+      }
+      />
     </Routes>
   );
 };

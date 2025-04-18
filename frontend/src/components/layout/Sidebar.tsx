@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../store/hooks";
+import { logout } from "../../store/auth/slice"; 
 
+import { Menu, X } from "lucide-react";
 import { MdDashboard } from "react-icons/md";
 import {
   FaUserGraduate,
@@ -22,11 +24,17 @@ const menuItems = [
   { label: "View Records", icon: <FaRegClipboard />, path: "/records" },
   { label: "View Issued Books", icon: <FaBookReader />, path: "/issued-books" },
   { label: "Default List", icon: <FaListAlt />, path: "/default-list" },
-  { label: "Logout", icon: <FiLogOut />, path: "/logout" },
 ];
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
 
   return (
     <aside
@@ -41,7 +49,7 @@ const Sidebar = () => {
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      <nav className="space-y-3">
+      <nav className="space-y-3 flex-1">
         {menuItems.map((item, index) => (
           <NavLink
             key={index}
@@ -53,16 +61,26 @@ const Sidebar = () => {
             }
           >
             <span className="text-lg">{item.icon}</span>
-            {isOpen ? <span>{item.label}</span> : null}
+            {isOpen && <span>{item.label}</span>}
           </NavLink>
         ))}
+
+        {/* Logout as a separate clickable item */}
+        <button
+          onClick={handleLogout}
+          className="w-full text-left p-2 rounded flex items-center gap-3 text-sm md:text-base hover:bg-gray-700 transition-colors duration-200"
+        >
+          <span className="text-lg">
+            <FiLogOut />
+          </span>
+          {isOpen && <span>Logout</span>}
+        </button>
       </nav>
     </aside>
   );
 };
 
 export default Sidebar;
-
 
 
 

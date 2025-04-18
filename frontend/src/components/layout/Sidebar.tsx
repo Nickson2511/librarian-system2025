@@ -1,22 +1,28 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 import { MdDashboard } from "react-icons/md";
-import { FaUserGraduate, FaBook, FaRegClipboard, FaBookReader, FaListAlt } from "react-icons/fa";
+import {
+  FaUserGraduate,
+  FaBook,
+  FaRegClipboard,
+  FaBookReader,
+  FaListAlt,
+} from "react-icons/fa";
 import { BiBookAdd, BiBookAlt } from "react-icons/bi";
 import { FiLogOut } from "react-icons/fi";
 
 const menuItems = [
-  { label: "Librarian Dashboard", icon: <MdDashboard /> },
-  { label: "Manage Students", icon: <FaUserGraduate /> },
-  { label: "Manage Books", icon: <FaBook /> },
-  { label: "Issue Book", icon: <BiBookAdd /> },
-  { label: "Return Book", icon: <BiBookAlt /> },
-  { label: "View Records", icon: <FaRegClipboard /> },
-  { label: "View Issued Books", icon: <FaBookReader /> },
-  { label: "Default List", icon: <FaListAlt /> },
-  { label: "Logout", icon: <FiLogOut /> },
+  { label: "Librarian Dashboard", icon: <MdDashboard />, path: "/dashboard" },
+  { label: "Manage Students", icon: <FaUserGraduate />, path: "/students" },
+  { label: "Manage Books", icon: <FaBook />, path: "/books" },
+  { label: "Issue Book", icon: <BiBookAdd />, path: "/issue-book" },
+  { label: "Return Book", icon: <BiBookAlt />, path: "/return-book" },
+  { label: "View Records", icon: <FaRegClipboard />, path: "/records" },
+  { label: "View Issued Books", icon: <FaBookReader />, path: "/issued-books" },
+  { label: "Default List", icon: <FaListAlt />, path: "/default-list" },
+  { label: "Logout", icon: <FiLogOut />, path: "/logout" },
 ];
 
 const Sidebar = () => {
@@ -37,14 +43,18 @@ const Sidebar = () => {
 
       <nav className="space-y-3">
         {menuItems.map((item, index) => (
-          <Link
+          <NavLink
             key={index}
-            to="#"
-            className="hover:bg-gray-700 p-2 rounded flex items-center gap-3 text-sm md:text-base"
+            to={item.path}
+            className={({ isActive }) =>
+              `p-2 rounded flex items-center gap-3 text-sm md:text-base transition-colors duration-200 ${
+                isActive ? "bg-gray-700" : "hover:bg-gray-700"
+              }`
+            }
           >
             <span className="text-lg">{item.icon}</span>
             {isOpen ? <span>{item.label}</span> : null}
-          </Link>
+          </NavLink>
         ))}
       </nav>
     </aside>
@@ -52,6 +62,11 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+
+
+
+
+
 
 
 

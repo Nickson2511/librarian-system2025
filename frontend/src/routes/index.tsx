@@ -9,6 +9,7 @@ import BookManager from '../components/BookManager';
 import IssueBook from '../components/IssueBook';
 import LibrarianLayout from '../layouts/LibrarianLayout';
 import ReturnBook from '../components/ReturnBook';
+import ViewRecords from '../components/ViewRecords';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -40,6 +41,12 @@ const AppRoutes = () => {
       <Route path="/return-book" element={
         <LibrarianLayout>
           <ReturnBook/>
+        </LibrarianLayout>
+      }
+      />
+      <Route path="/records" element={
+        <LibrarianLayout>
+          <ViewRecords />
         </LibrarianLayout>
       }
       />

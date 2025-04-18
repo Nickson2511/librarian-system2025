@@ -34,7 +34,7 @@ const LoginPage = () => {
     try {
       const result = await dispatch(loginAdmin(formData)).unwrap();
       console.log('Login successful! Token:', result);
-      navigate('/');
+      navigate('/dashboard');
       return null;
     } catch (err: unknown) {
       if (isErrorWithResponse(err)) {

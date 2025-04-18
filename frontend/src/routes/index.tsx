@@ -8,6 +8,7 @@ import StudentManager from '../components/StudentManager';
 import BookManager from '../components/BookManager';
 import IssueBook from '../components/IssueBook';
 import LibrarianLayout from '../layouts/LibrarianLayout';
+import ReturnBook from '../components/ReturnBook';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -30,9 +31,15 @@ const AppRoutes = () => {
           </LibrarianLayout>
           }
       />
-      <Route path='/issue-book' element={
+      <Route path="/issue-book" element={
         <LibrarianLayout>
           <IssueBook />
+        </LibrarianLayout>
+      }
+      />
+      <Route path="/return-book" element={
+        <LibrarianLayout>
+          <ReturnBook/>
         </LibrarianLayout>
       }
       />

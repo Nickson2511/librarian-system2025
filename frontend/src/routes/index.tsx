@@ -10,6 +10,8 @@ import IssueBook from '../components/IssueBook';
 import LibrarianLayout from '../layouts/LibrarianLayout';
 import ReturnBook from '../components/ReturnBook';
 import ViewRecords from '../components/ViewRecords';
+import IssuedBooks from '../components/IssuedBooks';
+import DefaulterList from '../components/DefaulterList';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -47,6 +49,18 @@ const AppRoutes = () => {
       <Route path="/records" element={
         <LibrarianLayout>
           <ViewRecords />
+        </LibrarianLayout>
+      }
+      />
+      <Route path="/issued-books" element={
+        <LibrarianLayout>
+          <IssuedBooks />
+          </LibrarianLayout>
+      }
+      />
+      <Route path="/default-list" element={
+        <LibrarianLayout>
+          <DefaulterList />
         </LibrarianLayout>
       }
       />

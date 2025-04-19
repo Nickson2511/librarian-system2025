@@ -102,6 +102,8 @@ const BookManager = () => {
   const handleDelete = async (id?: number) => {
     const targetId = id || editingId;
     if (!targetId) return;
+    const confirmDelete = window.confirm("Are you sure you want to delete this book?");
+    if (!confirmDelete) return;
 
     try {
       await axios.delete(
@@ -146,7 +148,6 @@ const BookManager = () => {
         )}
 
         <form className="space-y-4">
-          
 
           <div>
             <label htmlFor="bookId" className="block text-sm">
@@ -313,8 +314,6 @@ const BookManager = () => {
 };
 
 export default BookManager;
-
-
 
 
 

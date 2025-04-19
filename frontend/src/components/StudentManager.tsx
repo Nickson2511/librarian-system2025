@@ -99,6 +99,8 @@ const StudentManager: React.FC = () => {
   const handleDelete = async (id?: number) => {
     const targetId = id || editingId;
     if (!targetId) return;
+    const confirmDelete = window.confirm("Are you sure you want to delete this student?");
+    if (!confirmDelete) return;
 
     try {
       await axios.delete(

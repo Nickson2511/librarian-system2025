@@ -6,5 +6,5 @@ urlpatterns = [
     path('api/accounts/', include('accounts.urls')),
     path('api/students/', include('students.urls')),
     path('api/books/', include('books.urls')),
+    path('api/issued/', include('issuedbooks.urls')),
 ]
-

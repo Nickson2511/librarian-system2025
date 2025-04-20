@@ -61,4 +61,39 @@ class IssuedBookSerializer(serializers.ModelSerializer):
 
         return issued_book
 
+class ReturnBookSerializer(serializers.Serializer):
+    admission_number = serializers.CharField()
+    book_id = serializers.IntegerField()
+
+    def validate(self, data):
+        admission_number = data.get('admission_number')
+        book_id = data.get('book_id')
+
+        try:
+            student = Student.objects.get(admission_number=admission_number)
+        except Student.DoesNotExist:
+            raise serializers.ValidationError({"admission_number": "Student not found."})
+
+        try:
+            book = Book.objects.get(id=book_id)
+        except Book.DoesNotExist:
+            raise serializers.ValidationError({"book_id": "Book not found."})
+
+        try:
+            issued_book = IssuedBook.objects.get(
+                student=student,
+                book=book,
+                returned=False
+            )
+        except IssuedBook.DoesNotExist:
+            raise serializers.ValidationError({
+                "detail": "This book has not been issued to this student or has already been returned."
+            })
+
+        # Attach for use in view
+        data['student'] = student
+        data['book'] = book
+        data['issued_book'] = issued_book
+
+        return data
 

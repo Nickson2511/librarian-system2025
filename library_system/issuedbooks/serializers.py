@@ -3,13 +3,31 @@ from .models import IssuedBook
 from students.models import Student
 from books.models import Book
 
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = ['id', 'full_name', 'gender', 'admission_number',
+                  'primary_school_name', 'grade', 'stream']
+
+
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ['id', 'book_name', 'author_name', 'quantity']
+
+
 class IssuedBookSerializer(serializers.ModelSerializer):
+    student = StudentSerializer(read_only=True)
+    book = BookSerializer(read_only=True)
+
     admission_number = serializers.CharField(write_only=True, required=False)
     book_id = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = IssuedBook
-        fields = ['id', 'student', 'book', 'issue_date', 'due_date', 'returned', 'admission_number', 'book_id']
+        fields = ['id', 'student', 'book', 'issue_date',
+                  'due_date', 'returned', 'admission_number', 'book_id']
         read_only_fields = ['student', 'book']
 
     def create(self, validated_data):
@@ -20,7 +38,8 @@ class IssuedBookSerializer(serializers.ModelSerializer):
         try:
             student = Student.objects.get(admission_number=admission_number)
         except Student.DoesNotExist:
-            raise serializers.ValidationError({"admission_number": "Student not found."})
+            raise serializers.ValidationError(
+                {"admission_number": "Student not found."})
 
         # Look up book
         try:
@@ -34,7 +53,6 @@ class IssuedBookSerializer(serializers.ModelSerializer):
                 "book_id": f"The book '{book.book_name}' is already issued to another student and not yet returned."
             })
 
-        # Create issued book
         issued_book = IssuedBook.objects.create(
             student=student,
             book=book,
@@ -42,16 +60,5 @@ class IssuedBookSerializer(serializers.ModelSerializer):
         )
 
         return issued_book
-
-
-
-
-
-
-
-
-
-
-
 
 

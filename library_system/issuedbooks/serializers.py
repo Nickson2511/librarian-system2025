@@ -27,7 +27,7 @@ class IssuedBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = IssuedBook
         fields = ['id', 'student', 'book', 'issue_date',
-                  'due_date', 'returned', 'admission_number', 'book_id']
+                'due_date', 'returned', 'admission_number', 'book_id']
         read_only_fields = ['student', 'book']
 
     def create(self, validated_data):

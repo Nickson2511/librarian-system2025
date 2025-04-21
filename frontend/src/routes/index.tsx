@@ -12,6 +12,8 @@ import ReturnBook from '../components/ReturnBook';
 import ViewRecords from '../components/ViewRecords';
 import IssuedBooks from '../components/IssuedBooks';
 import DefaulterList from '../components/DefaulterList';
+import PrivateRoute from '../components/PrivateRoute';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -19,20 +21,25 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/dashboard" element={
+        <PrivateRoute>
+          <DashboardPage />
+        </PrivateRoute>
+      }
+      />
       <Route
-  path="/students"
-  element={
-    <LibrarianLayout>
-      <StudentManager />
-    </LibrarianLayout>
-  }
+        path="/students"
+        element={
+          <LibrarianLayout>
+            <StudentManager />
+          </LibrarianLayout>
+        }
       />
       <Route path="/books" element={
         <LibrarianLayout>
           <BookManager />
-          </LibrarianLayout>
-          }
+        </LibrarianLayout>
+      }
       />
       <Route path="/issue-book" element={
         <LibrarianLayout>
@@ -42,7 +49,7 @@ const AppRoutes = () => {
       />
       <Route path="/return-book" element={
         <LibrarianLayout>
-          <ReturnBook/>
+          <ReturnBook />
         </LibrarianLayout>
       }
       />
@@ -55,7 +62,7 @@ const AppRoutes = () => {
       <Route path="/issued-books" element={
         <LibrarianLayout>
           <IssuedBooks />
-          </LibrarianLayout>
+        </LibrarianLayout>
       }
       />
       <Route path="/default-list" element={

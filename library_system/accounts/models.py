@@ -1,5 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+from django.conf import settings
+
 
 class AdminUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -16,6 +20,7 @@ class AdminUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         return self.create_user(email, password, **extra_fields)
 
+
 class AdminUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -31,3 +36,26 @@ class AdminUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class PasswordResetOTP(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            on_delete=models.CASCADE)
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_valid(self):
+        return not self.is_used and timezone.now() < self.created_at + timedelta(minutes=10)
+
+
+
+
+
+
+
+
+
+
+
+

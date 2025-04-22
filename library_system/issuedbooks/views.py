@@ -2,10 +2,11 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from .models import IssuedBook
 from .serializers import IssuedBookSerializer, ReturnBookSerializer
 from books.models import Book
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
 
 class IssueBookView(generics.CreateAPIView):
@@ -15,10 +16,13 @@ class IssueBookView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        print("Request data:", request.data)
 
         try:
             serializer.is_valid(raise_exception=True)
+            print("Validated data:", serializer.validated_data)
             self.perform_create(serializer)
+
             return Response(
                 {
                     "message": "Book issued successfully.",
@@ -26,11 +30,13 @@ class IssueBookView(generics.CreateAPIView):
                 },
                 status=status.HTTP_201_CREATED
             )
-        except Exception as e:
+
+        except ValidationError as e:
+            print("Validation Error:", e.detail)
             return Response(
                 {
                     "error": "Book could not be issued.",
-                    "details": serializer.errors
+                    "details": e.detail
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -72,8 +78,7 @@ class IssuedBookDetailView(generics.RetrieveUpdateDestroyAPIView):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(
-            instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
 
         try:
             serializer.is_valid(raise_exception=True)
@@ -104,6 +109,7 @@ class IssuedBookDetailView(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_204_NO_CONTENT
         )
 
+
 class ReturnBookView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -127,6 +133,7 @@ class ReturnBookView(APIView):
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ReturnedBooksListView(ListAPIView):
     queryset = IssuedBook.objects.filter(returned=True)
@@ -154,3 +161,5 @@ class ReturnedBookDetailView(RetrieveAPIView):
             "message": "Returned book fetched successfully.",
             "data": serializer.data
         }, status=status.HTTP_200_OK)
+
+

@@ -7,8 +7,10 @@ from books.models import Book
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['id', 'full_name', 'gender', 'admission_number',
-                  'primary_school_name', 'grade', 'stream']
+        fields = [
+            'id', 'full_name', 'gender', 'admission_number',
+            'primary_school_name', 'grade', 'stream'
+        ]
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -26,31 +28,33 @@ class IssuedBookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IssuedBook
-        fields = ['id', 'student', 'book', 'issue_date',
-                'due_date', 'returned', 'admission_number', 'book_id']
+        fields = [
+            'id', 'student', 'book', 'issue_date',
+            'due_date', 'returned', 'admission_number', 'book_id'
+        ]
         read_only_fields = ['student', 'book']
 
     def create(self, validated_data):
         admission_number = validated_data.pop('admission_number', None)
         book_id = validated_data.pop('book_id', None)
 
-        # Look up student
         try:
             student = Student.objects.get(admission_number=admission_number)
         except Student.DoesNotExist:
-            raise serializers.ValidationError(
-                {"admission_number": "Student not found."})
+            raise serializers.ValidationError({
+                "admission_number": "Student not found."
+            })
 
-        # Look up book
         try:
             book = Book.objects.get(id=book_id)
         except Book.DoesNotExist:
             raise serializers.ValidationError({"book_id": "Book not found."})
 
-        # Check if the book is already issued and not returned
-        if IssuedBook.objects.filter(book=book, returned=False).exists():
+        active_issues = IssuedBook.objects.filter(book=book, returned=False).count()
+
+        if active_issues >= book.quantity:
             raise serializers.ValidationError({
-                "book_id": f"The book '{book.book_name}' is already issued to another student and not yet returned."
+                "book_id": f"All copies of '{book.book_name}' are already issued."
             })
 
         issued_book = IssuedBook.objects.create(
@@ -59,7 +63,12 @@ class IssuedBookSerializer(serializers.ModelSerializer):
             **validated_data
         )
 
+        # Reduce quantity
+        book.quantity -= 1
+        book.save()
+
         return issued_book
+
 
 class ReturnBookSerializer(serializers.Serializer):
     admission_number = serializers.CharField()
@@ -72,7 +81,9 @@ class ReturnBookSerializer(serializers.Serializer):
         try:
             student = Student.objects.get(admission_number=admission_number)
         except Student.DoesNotExist:
-            raise serializers.ValidationError({"admission_number": "Student not found."})
+            raise serializers.ValidationError({
+                "admission_number": "Student not found."
+            })
 
         try:
             book = Book.objects.get(id=book_id)
@@ -96,4 +107,3 @@ class ReturnBookSerializer(serializers.Serializer):
         data['issued_book'] = issued_book
 
         return data
-

@@ -1,16 +1,34 @@
-// src/components/ForgotPasswordPage.tsx
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import LibrarySvg from '../assets/library.svg';
 
 const ForgotPasswordPage = () => {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [email, setEmail] = useState<string>('');
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: Add actual reset logic
-    setSubmitted(true);
+    try {
+      const response = await axios.post<{ message: string }>(
+        'http://127.0.0.1:8000/api/accounts/forgot-password/',
+        { email }
+      );
+      console.log(response.data);
+      setSubmitted(true);
+      setError('');
+      setTimeout(() => {
+        navigate('/verify-otp', { state: { email } });
+      }, 2000);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Something went wrong');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
   };
 
   return (
@@ -25,7 +43,7 @@ const ForgotPasswordPage = () => {
         >
           <h2 className="text-2xl font-bold mb-6">Forgot Password</h2>
           {submitted ? (
-            <p className="text-green-400 mb-4">If your email is valid, a reset link has been sent.</p>
+            <p className="text-green-400 mb-4">OTP has been sent to your email.</p>
           ) : (
             <>
               <input
@@ -36,11 +54,12 @@ const ForgotPasswordPage = () => {
                 className="w-full mb-4 p-3 bg-gray-900 border border-gray-700 rounded-lg"
                 required
               />
+              {error && <p className="text-red-500 mb-2">{error}</p>}
               <button
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
               >
-                Send Reset Link
+                Send OTP
               </button>
             </>
           )}
@@ -57,3 +76,11 @@ const ForgotPasswordPage = () => {
 };
 
 export default ForgotPasswordPage;
+
+
+
+
+
+
+
+
